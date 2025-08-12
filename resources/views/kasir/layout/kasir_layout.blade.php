@@ -16,7 +16,7 @@
 </head>
 
 <body>
-    @include('admin.layout.navbar')
+    @include('kasir.layout.navbar')
 </body>
 
 </html>
