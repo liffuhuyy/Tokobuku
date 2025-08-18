@@ -17,6 +17,11 @@
 
 <body>
     @include('admin.layout.navbar')
+    <div class="d-flex flex-grow-1">
+        @include('admin.layout.sidebar')
+        <div class="container-fluid p-3">
+            @yield('content')
+        </div>
 </body>
 
 </html>

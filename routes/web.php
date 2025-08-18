@@ -5,6 +5,9 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\KasirController;
+use App\Http\Controllers\ManagementbukuController;
+use App\Http\Controllers\ManagementuserController;
+use App\Http\Controllers\TransaksiController;
 use App\Http\Middleware\RoleMiddleware;
 
 Route::get('/', function () {
@@ -18,6 +21,9 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 // Hanya admin
 Route::middleware(['auth', RoleMiddleware::class . ':admin'])->group(function () {
     Route::get('/admin', [AdminController::class, 'index'])->name('admin.dashboard');
+    Route::get('/management-buku', [ManagementbukuController::class, 'index'])->name('admin.management_buku');
+    Route::get('/management-kasir', [ManagementuserController::class, 'index'])->name('admin.management_kasir');
+    Route::get('/riwayat-transaksi', [TransaksiController::class, 'index'])->name('admin.riwayat_transaksi');
 });
 
 // Hanya owner
