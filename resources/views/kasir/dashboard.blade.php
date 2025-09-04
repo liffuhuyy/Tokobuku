@@ -1,17 +1,17 @@
     <title>Dashboard kasir</title>
 
     <body>
-        @include('kasir.layout.kasir_layout')
-        <div class="container mt-3">
+        @extends('kasir.layout.kasir_layout')
+        @section('content')
             <div class="row">
                 <div class="col-md-12">
                     <h1>Dashboard</h1>
                     @if (auth()->user('kasir'))
-                        <p>Halo Kasir!
+                        <p>Halo kasir!
                             Selamat datang di dashboard kasir.
                         </p>
                     @endif
                 </div>
             </div>
-        </div>
+        @endsection
     </body>

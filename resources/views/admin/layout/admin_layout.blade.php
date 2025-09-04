@@ -16,13 +16,48 @@
 </head>
 
 <body>
-    @include('admin.layout.navbar')
-    <div class="d-flex flex-grow-1">
-        @include('admin.layout.sidebar')
-        <div class="container-fluid p-3">
+    <!-- Navbar -->
+    <div class="fixed-top">
+        @include('admin.layout.navbar')
+    </div>
+
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <div class="bg-light border-end vh-100 position-fixed" style="width: 250px; margin-top: 56px;">
+            @include('admin.layout.sidebar')
+        </div>
+
+        <!-- Content -->
+        <div class="container-fluid" style="margin-top: 80px; margin-left: 260px;">
             @yield('content')
         </div>
+    </div>
+
+    <!-- Modal Logout -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="logoutModalLabel">Konfirmasi Logout</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Apakah Anda yakin ingin logout?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="btn btn-primary">Ya, Logout</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle JS (WAJIB pakai yang bundle) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

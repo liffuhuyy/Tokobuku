@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name'); // Nama pengguna
             $table->string('email')->unique(); // Email unik
+            $table->timestamp('email_verified_at')->nullable(); // ✅ tambahkan ini
             $table->string('password'); // Password hash
             $table->enum('role', ['admin', 'owner', 'kasir'])->default('kasir'); // Role
             $table->rememberToken(); // Token untuk "remember me"

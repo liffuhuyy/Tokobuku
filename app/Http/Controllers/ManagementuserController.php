@@ -11,4 +11,6 @@ class ManagementuserController extends Controller
     {
         return view('admin.management_kasir');
     }
+
+    //kasir
 }

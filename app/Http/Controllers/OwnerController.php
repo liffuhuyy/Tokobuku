@@ -21,4 +21,19 @@ class OwnerController extends Controller
     {
         return view('owner.dashboard');
     }
+
+    public function buku()
+    {
+        return view('owner.data_buku');
+    }
+
+    public function data_user()
+    {
+        return view('owner.data_user');
+    }
+
+    public function penjualan()
+    {
+        return view('owner.penjualan');
+    }
 }
