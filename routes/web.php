@@ -8,6 +8,7 @@ use App\Http\Controllers\KasirController;
 use App\Http\Controllers\ManagementbukuController;
 use App\Http\Controllers\ManagementuserController;
 use App\Http\Controllers\TransaksiController;
+use App\Http\Controllers\Kategori;
 use App\Http\Middleware\RoleMiddleware;
 
 //model
@@ -24,17 +25,22 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // Hanya admin
 Route::middleware(['auth', RoleMiddleware::class . ':admin'])->group(function () {
+    //dashboard admin
     Route::get('/admin', [AdminController::class, 'index'])->name('admin.dashboard');
 
     //management buku
     Route::get('/management-buku', [ManagementbukuController::class, 'index'])->name('admin.management_buku');
     Route::post('/management-buku', [ManagementbukuController::class, 'store'])->name('admin.management_buku.store');
-    Route::delete('/management-buku/{id}', [ManagementbukuController::class, 'destroy'])->name('admin.management_buku.destroy');
-    Route::get('/management-buku/{id}/edit', [ManagementbukuController::class, 'edit'])->name('admin.management_buku.edit');
-    Route::put('/management-buku/{id}', [ManagementbukuController::class, 'update'])->name('admin.management_buku.update');
+    Route::get('/admin/management_buku/kode/{kategori}', [ManagementBukuController::class, 'generateKode'])->name('admin.management_buku.generateKode');
+    Route::delete('/admin/management_buku/{id}/delete', [ManagementBukuController::class, 'destroy'])->name('admin.management_buku.destroy');
+    Route::get('/admin/management_buku/{id}/edit', [ManagementbukuController::class, 'edit'])->name('admin.management_buku.edit');
+    Route::put('/admin/management_buku/{id}', [ManagementbukuController::class, 'update'])->name('admin.management_buku.update');
 
     //management user
     Route::get('/management-kasir', [ManagementuserController::class, 'index'])->name('admin.management_kasir');
+
+    //management kategori
+    Route::get('/management-kategori', [Kategori::class, 'index'])->name('admin.management_kategori');
 
     //riwayat transaksi
     Route::get('/riwayat', [TransaksiController::class, 'riwayat'])->name('admin.riwayat_transaksi');

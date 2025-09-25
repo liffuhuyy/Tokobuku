@@ -37,10 +37,6 @@
                                         <th class="border-0">Kode Buku</th>
                                         <th class="border-0">Judul Buku</th>
                                         <th class="border-0">Cover Buku</th>
-                                        <th class="border-0">Penerbit</th>
-                                        <th class="border-0">Pengarang</th>
-                                        <th class="border-0">Kategori</th>
-                                        <th class="border-0">Tahun Terbit</th>
                                         <th class="border-0">Aksi</th>
                                     </tr>
                                 </thead>
@@ -50,7 +46,7 @@
                                         <tr>
                                             <td class="text-center">{{ $loop->iteration }}</td>
                                             <td class="text-center">{{ $item->kode_buku }}</td>
-                                            <td>{{ $item->judul_buku }}</td>
+                                            <td class="text-center">{{ $item->judul_buku }}</td>
                                             <td class="text-center">
                                                 @if ($item->cover_buku)
                                                     <img src="{{ asset('storage/' . $item->cover_buku) }}" alt="Cover Buku"
@@ -59,20 +55,51 @@
                                                     <span class="badge bg-secondary">Tidak ada cover</span>
                                                 @endif
                                             </td>
-                                            <td class="text-center">{{ $item->penerbit }}</td>
-                                            <td class="text-center">{{ $item->pengarang }}</td>
-                                            <td class="text-center">{{ $item->kategori }}</td>
-                                            <td class="text-center">{{ $item->tahun_terbit }}</td>
+
                                             <td class="text-center">
+                                                <!-- Modal detail-->
+                                                <div class="modal fade" id="detailModal{{ $item->id }}" tabindex="-1"
+                                                    aria-labelledby="detailModalLabel{{ $item->id }}"
+                                                    aria-hidden="true">
+                                                    <div class="modal-dialog modal-lg">
+                                                        <div class="modal-content">
+
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title"
+                                                                    id="detailModalLabel{{ $item->id }}">Detail Buku -
+                                                                    {{ $item->judul_buku }}</h5>
+                                                                <button type="button" class="btn-close"
+                                                                    data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+
+                                                            <div class="modal-body">
+                                                                <ul class="list-unstyled mb-0">
+                                                                    <li><strong>Penerbit:</strong> {{ $item->penerbit }}
+                                                                    </li>
+                                                                    <li><strong>Pengarang:</strong> {{ $item->pengarang }}
+                                                                    </li>
+                                                                    <li><strong>Kategori:</strong> {{ $item->kategori }}
+                                                                    </li>
+                                                                    <li><strong>Tahun Terbit:</strong>
+                                                                        {{ $item->tahun_terbit }}</li>
+                                                                </ul>
+                                                            </div>
+
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary"
+                                                                    data-bs-dismiss="modal">Tutup</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- button akasi -->
+                                                <button type="button" class="btn btn-sm btn-primary text-white"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#detailModal{{ $item->id }}">
+                                                    Detail
+                                                </button>
                                                 <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
-                                                    data-bs-target="#editModal"
-                                                    onclick="document.getElementById('editForm').action='{{ route('admin.management_buku.update', $item->id) }}';
-                                                    document.getElementById('edit_kode_buku').value='{{ $item->kode_buku }}';
-                                                    document.getElementById('edit_judul_buku').value='{{ $item->judul_buku }}';
-                                                    document.getElementById('edit_penerbit').value='{{ $item->penerbit }}';
-                                                    document.getElementById('edit_pengarang').value='{{ $item->pengarang }}';
-                                                    document.getElementById('edit_kategori').value='{{ $item->kategori }}';
-                                                    document.getElementById('edit_tahun_terbit').value='{{ $item->tahun_terbit }}';">
+                                                    data-bs-target="#editModal" onclick="editBuku({{ $item }})">
                                                     Edit
                                                 </button>
                                                 <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal"
@@ -91,12 +118,14 @@
                                         </tr>
                                     @endforelse
                                 </tbody>
+
                             </table>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <!-- Modal delete -->
             <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
@@ -110,7 +139,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                            <form id="deleteForm" method="POST" action="">
+                            <form id="deleteForm" method="POST">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-danger">Ya, Hapus</button>
@@ -121,56 +150,72 @@
             </div>
 
             <!-- Modal tambah -->
-            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                aria-hidden="true">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="exampleModalLabel">Tambah Buku</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
                             <form action="{{ route('admin.management_buku.store') }}" method="POST"
                                 enctype="multipart/form-data">
                                 @csrf
-                                <div class="mb-3">
-                                    <label for="kode_buku" class="form-label">Kode Buku</label>
-                                    <input type="text" class="form-control" id="kode_buku" name="kode_buku" required>
+
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label for="kode_buku" class="form-label">Kode Buku</label>
+                                        <input type="text" id="kode_buku" name="kode_buku" class="form-control"
+                                            readonly>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="judul_buku" class="form-label">Judul Buku</label>
+                                        <input type="text" name="judul_buku" id="judul_buku" class="form-control"
+                                            required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="cover_buku" class="form-label">Cover Buku</label>
+                                        <input type="file" name="cover_buku" id="cover_buku" class="form-control"
+                                            accept="image/*">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="penerbit" class="form-label">Penerbit</label>
+                                        <input type="text" name="penerbit" id="penerbit" class="form-control"
+                                            required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="pengarang" class="form-label">Pengarang</label>
+                                        <input type="text" name="pengarang" id="pengarang" class="form-control"
+                                            required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="tahun_terbit" class="form-label">Tahun Terbit</label>
+                                        <input type="number" name="tahun_terbit" id="tahun_terbit" class="form-control"
+                                            required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="kategori" class="form-label">Kategori</label>
+                                        <select class="form-select" id="kategori" name="kategori" required>
+                                            <option selected disabled>Pilih kategori</option>
+                                            @foreach ($kategori as $kat)
+                                                <option value="{{ $kat->kategori }}">{{ $kat->kategori }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
                                 </div>
-                                <div class="mb-3">
-                                    <label for="judul_buku" class="form-label">Judul Buku</label>
-                                    <input type="text" class="form-control" id="judul_buku" name="judul_buku"
-                                        required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="cover_buku" class="form-label">Cover Buku</label>
-                                    <input type="file" class="form-control" id="cover_buku" name="cover_buku"
-                                        accept="image/*">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="penerbit" class="form-label">Penerbit</label>
-                                    <input type="text" class="form-control" id="penerbit" name="penerbit" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="pengarang" class="form-label">Pengarang</label>
-                                    <input type="text" class="form-control" id="pengarang" name="pengarang" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="kategori" class="form-label">Kategori</label>
-                                    <select class="form-select" id="kategori" name="kategori">
-                                        <option selected disabled>Pilih kategori</option>
-                                        @foreach ($kategori as $kat)
-                                            <option value="{{ $kat->kategori }}">{{ $kat->kategori }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="tahun_terbit" class="form-label">Tahun Terbit</label>
-                                    <input type="number" class="form-control" id="tahun_terbit" name="tahun_terbit"
-                                        required>
-                                </div>
+
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary"
-                                        data-bs-dismiss="modal">Tutup</button>
+                                        data-bs-dismiss="modal">Batal</button>
                                     <button type="submit" class="btn btn-primary">Simpan</button>
                                 </div>
                             </form>
@@ -183,54 +228,65 @@
             <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
+
                         <div class="modal-header">
                             <h5 class="modal-title" id="editModalLabel">Edit Buku</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"
                                 aria-label="Close"></button>
                         </div>
+
                         <div class="modal-body">
                             <form id="editForm" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 @method('PUT')
+
+                                <!-- Kode Buku (readonly) -->
                                 <div class="mb-3">
                                     <label for="edit_kode_buku" class="form-label">Kode Buku</label>
                                     <input type="text" class="form-control" id="edit_kode_buku" name="kode_buku"
-                                        required>
+                                        readonly>
                                 </div>
+
                                 <div class="mb-3">
                                     <label for="edit_judul_buku" class="form-label">Judul Buku</label>
                                     <input type="text" class="form-control" id="edit_judul_buku" name="judul_buku"
                                         required>
                                 </div>
+
                                 <div class="mb-3">
                                     <label for="edit_cover_buku" class="form-label">Cover Buku</label>
                                     <input type="file" class="form-control" id="edit_cover_buku" name="cover_buku"
                                         accept="image/*">
                                 </div>
+
                                 <div class="mb-3">
                                     <label for="edit_penerbit" class="form-label">Penerbit</label>
                                     <input type="text" class="form-control" id="edit_penerbit" name="penerbit"
                                         required>
                                 </div>
+
                                 <div class="mb-3">
                                     <label for="edit_pengarang" class="form-label">Pengarang</label>
                                     <input type="text" class="form-control" id="edit_pengarang" name="pengarang"
                                         required>
                                 </div>
+
                                 <div class="mb-3">
                                     <label for="edit_kategori" class="form-label">Kategori</label>
-                                    <select class="form-select" id="edit_kategori" name="kategori">
+                                    <select class="form-select" id="edit_kategori" name="kategori" required>
                                         <option selected disabled>Pilih kategori</option>
                                         @foreach ($kategori as $kat)
                                             <option value="{{ $kat->kategori }}">{{ $kat->kategori }}</option>
                                         @endforeach
                                     </select>
                                 </div>
+
                                 <div class="mb-3">
                                     <label for="edit_tahun_terbit" class="form-label">Tahun Terbit</label>
                                     <input type="number" class="form-control" id="edit_tahun_terbit"
                                         name="tahun_terbit" required>
                                 </div>
+
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary"
                                         data-bs-dismiss="modal">Tutup</button>
@@ -238,6 +294,7 @@
                                 </div>
                             </form>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -245,13 +302,73 @@
     </body>
 
     <script>
+        // Fungsi umum untuk generate kode buku
+        async function generateKodeBuku(kategori, inputTarget) {
+            if (!kategori) {
+                inputTarget.value = '';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/admin/management_buku/kode/${kategori}`);
+                if (!response.ok) throw new Error('Gagal ambil kode buku');
+
+                const data = await response.json();
+                inputTarget.value = data.kode ?? '';
+            } catch (err) {
+                console.error('Error fetch kode buku:', err);
+                inputTarget.value = '';
+            }
+        }
+
+        // Fungsi untuk edit buku (isi modal edit)
+        function editBuku(item) {
+            document.getElementById('editForm').action = `/admin/management_buku/${item.id}`;
+
+            document.getElementById('edit_kode_buku').value = item.kode_buku;
+            document.getElementById('edit_judul_buku').value = item.judul_buku;
+            document.getElementById('edit_penerbit').value = item.penerbit;
+            document.getElementById('edit_pengarang').value = item.pengarang;
+            document.getElementById('edit_kategori').value = item.kategori;
+            document.getElementById('edit_tahun_terbit').value = item.tahun_terbit;
+
+            if (item.cover_buku) {
+                document.getElementById('preview_cover').src = `/storage/${item.cover_buku}`;
+            } else {
+                document.getElementById('preview_cover').src = '';
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
-            var deleteModal = document.getElementById('deleteModal');
-            deleteModal.addEventListener('show.bs.modal', function(event) {
-                var button = event.relatedTarget; // tombol yang diklik
-                var id = button.getAttribute('data-id'); // ambil data-id buku
-                var form = document.getElementById('deleteForm');
-                form.action = "/admin/management_buku/" + id; // ganti action form sesuai id
-            });
+            // === Modal Tambah ===
+            const createKategoriSelect = document.getElementById('kategori');
+            const createKodeInput = document.getElementById('kode_buku');
+
+            if (createKategoriSelect && createKodeInput) {
+                createKategoriSelect.addEventListener('change', function() {
+                    generateKodeBuku(this.value, createKodeInput);
+                });
+            }
+
+            // === Modal Edit ===
+            const editKategoriSelect = document.getElementById('edit_kategori');
+            const editKodeInput = document.getElementById('edit_kode_buku');
+
+            if (editKategoriSelect && editKodeInput) {
+                editKategoriSelect.addEventListener('change', function() {
+                    generateKodeBuku(this.value, editKodeInput);
+                });
+            }
+
+            // === Modal Hapus ===
+            const deleteModal = document.getElementById('deleteModal');
+            if (deleteModal) {
+                deleteModal.addEventListener('show.bs.modal', function(event) {
+                    const button = event.relatedTarget;
+                    const id = button.getAttribute('data-id');
+                    const form = document.getElementById('deleteForm');
+                    form.action = "{{ route('admin.management_buku.destroy', ':id') }}".replace(':id', id);
+                });
+            }
         });
     </script>

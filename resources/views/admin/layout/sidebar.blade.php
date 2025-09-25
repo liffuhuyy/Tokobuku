@@ -25,6 +25,12 @@
             </a>
         </li>
         <li>
+            <a href="{{ route('admin.management_kategori') }}"
+                class="nav-link text-dark {{ request()->routeIs('admin.management_kategori') ? 'active bg-primary text-white' : '' }}">
+                <i class="bi bi-tags"></i> Kategori
+            </a>
+        </li>
+        <li>
             <a href="{{ route('admin.riwayat_transaksi') }}"
                 class="nav-link text-dark {{ request()->routeIs('admin.riwayat_transaksi') ? 'active bg-primary text-white' : '' }}">
                 <i class="bi bi-cart"></i> Riwayat Transaksi

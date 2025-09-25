@@ -1,0 +1,12 @@
+    <title>Management Kategori</title>
+
+    <body>
+        @extends('admin.layout.admin_layout')
+        @section('content')
+            <div class="row">
+                <div class="col-md-12">
+                    <h1>Management Kategori</h1>
+                </div>
+            </div>
+        @endsection
+    </body>

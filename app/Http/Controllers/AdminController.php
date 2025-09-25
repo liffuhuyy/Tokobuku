@@ -6,6 +6,7 @@ use App\Models\User;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Routing\Controller;
+use App\Models\DataBuku;
 
 use Illuminate\Http\Request;
 
@@ -19,6 +20,11 @@ class AdminController extends Controller
 
     public function index()
     {
-        return view('admin.dashboard');
+        $totalBuku = \App\Models\DataBuku::count();
+        $totaluser = User::count();
+        $buku = DataBuku::all();
+
+
+        return view('admin.dashboard', compact('totalBuku', 'totaluser', 'buku'));
     }
 }
