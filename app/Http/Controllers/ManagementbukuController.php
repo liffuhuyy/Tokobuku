@@ -22,46 +22,46 @@ class ManagementbukuController extends Controller
 
     public function store(Request $request)
     {
-        // Validasi input (hapus kode_buku dari rules, karena akan di-generate)
         $request->validate([
             'judul_buku'   => 'required',
             'penerbit'     => 'required',
             'pengarang'    => 'required',
             'tahun_terbit' => 'required|digits:4|integer|min:1000|max:' . date('Y'),
             'cover_buku'   => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'kategori'     => 'required',
+            'kategori'     => 'required|exists:kategori,id', // pastikan ID valid
         ]);
 
-        // === Generate kode buku otomatis ===
-        $kategori = $request->kategori;
+        // Ambil nama kategori berdasarkan ID
+        $kategoriModel = \App\Models\Kategori::find($request->kategori);
+        $kategoriName = $kategoriModel->kategori;
 
-        // Ambil huruf pertama kategori (uppercase)
-        $inisial = strtoupper(substr($kategori, 0, 1));
+        // Ambil huruf pertama nama kategori
+        $inisial = strtoupper(mb_substr($kategoriName, 0, 1));
 
-        // Hitung jumlah buku pada kategori tsb
-        $count = DataBuku::where('kategori', $kategori)->count() + 1;
+        // Hitung jumlah buku dalam kategori ini
+        $count = \App\Models\DataBuku::where('kategori', $kategoriName)->count() + 1;
 
-        // Format nomor urut 2 digit (01, 02, ...)
+        // Format nomor urut
         $nomor = str_pad($count, 2, '0', STR_PAD_LEFT);
 
         // Bentuk kode buku
         $kodeBuku = 'BK' . $inisial . $nomor;
 
-        // === Handle file upload jika ada ===
+        // Upload cover bila ada
         $coverPath = null;
         if ($request->hasFile('cover_buku')) {
             $coverPath = $request->file('cover_buku')->store('covers', 'public');
         }
 
         // Simpan data buku
-        DataBuku::create([
-            'kode_buku'   => $kodeBuku, // <-- otomatis, tidak bisa diubah dari form
+        \App\Models\DataBuku::create([
+            'kode_buku'   => $kodeBuku,
             'judul_buku'  => $request->judul_buku,
             'penerbit'    => $request->penerbit,
             'pengarang'   => $request->pengarang,
             'tahun_terbit' => $request->tahun_terbit,
             'cover_buku'  => $coverPath,
-            'kategori'    => $kategori,
+            'kategori'    => $kategoriName, // simpan nama kategori (bukan ID)
         ]);
 
         return redirect()->back()->with('success', 'Buku berhasil ditambahkan!');
@@ -81,20 +81,35 @@ class ManagementbukuController extends Controller
         return redirect()->back()->with('success', 'Buku berhasil dihapus!');
     }
 
-    public function generateKode($kategori)
+    public function generateKode($kategoriId)
     {
-        // Ambil huruf pertama kategori
-        $inisial = strtoupper(substr($kategori, 0, 1));
-        // Hitung jumlah buku di kategori ini
-        $count = DataBuku::where('kategori', $kategori)->count() + 1;
-        // Format nomor urut 2 digit
+        // Ambil data kategori berdasarkan ID
+        $kategori = \App\Models\Kategori::find($kategoriId);
+
+        if (!$kategori) {
+            return response()->json([
+                'error' => 'Kategori tidak ditemukan'
+            ], 404);
+        }
+
+        // Ambil nama kategori & huruf pertama
+        $namaKategori = $kategori->kategori;
+        $inisial = strtoupper(mb_substr($namaKategori, 0, 1));
+
+        // Hitung jumlah buku berdasarkan nama kategori
+        $count = \App\Models\DataBuku::where('kategori', $namaKategori)->count() + 1;
+
+        // Format nomor urut
         $nomor = str_pad($count, 2, '0', STR_PAD_LEFT);
+
         // Bentuk kode buku
         $kodeBuku = 'BK' . $inisial . $nomor;
+
         return response()->json([
             'kode' => $kodeBuku
         ]);
     }
+
 
     public function edit($id)
     {
@@ -104,63 +119,47 @@ class ManagementbukuController extends Controller
 
     public function update(Request $request, $id)
     {
-        // Ambil buku yang akan di-update
-        $buku = DataBuku::findOrFail($id);
+        $buku = \App\Models\DataBuku::findOrFail($id);
 
-        // Validasi input (hapus kode_buku dari rules)
         $request->validate([
             'judul_buku'   => 'required',
             'penerbit'     => 'required',
             'pengarang'    => 'required',
             'tahun_terbit' => 'required|digits:4|integer|min:1000|max:' . date('Y'),
             'cover_buku'   => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'kategori'     => 'required',
+            'kategori'     => 'required|exists:kategori,id',
         ]);
 
-        // Jika kategori berubah → generate kode_buku baru
-        if ($request->kategori !== $buku->kategori) {
-            $kategori = $request->kategori;
+        // Ambil kategori baru
+        $kategoriModel = \App\Models\Kategori::find($request->kategori);
+        $kategoriName = $kategoriModel->kategori;
 
-            // Ambil huruf pertama kategori (uppercase)
-            $inisial = strtoupper(substr($kategori, 0, 1));
-
-            // Hitung jumlah buku pada kategori tsb
-            $count = DataBuku::where('kategori', $kategori)->count() + 1;
-
-            // Format nomor urut 2 digit
+        // Jika kategori berubah, generate ulang kode buku
+        if ($kategoriName !== $buku->kategori) {
+            $inisial = strtoupper(mb_substr($kategoriName, 0, 1));
+            $count = \App\Models\DataBuku::where('kategori', $kategoriName)->count() + 1;
             $nomor = str_pad($count, 2, '0', STR_PAD_LEFT);
-
-            // Bentuk kode buku baru
             $buku->kode_buku = 'BK' . $inisial . $nomor;
         }
 
-        // Update atribut dasar
         $buku->judul_buku   = $request->judul_buku;
         $buku->penerbit     = $request->penerbit;
         $buku->pengarang    = $request->pengarang;
         $buku->tahun_terbit = $request->tahun_terbit;
-        $buku->kategori     = $request->kategori;
+        $buku->kategori     = $kategoriName;
 
-        // Jika ada upload cover baru
         if ($request->hasFile('cover_buku')) {
-            // Hapus file lama bila ada
             if ($buku->cover_buku) {
                 Storage::disk('public')->delete($buku->cover_buku);
             }
-
-            // Simpan file baru
             $path = $request->file('cover_buku')->store('covers', 'public');
             $buku->cover_buku = $path;
         }
 
-        // Simpan perubahan
         $buku->save();
 
-        return redirect()
-            ->route('admin.management_buku')
-            ->with('success', 'Buku berhasil diperbarui!');
+        return redirect()->route('admin.management_buku')->with('success', 'Buku berhasil diperbarui!');
     }
-
 
     public function create()
     {

@@ -93,18 +93,18 @@
                                                     </div>
                                                 </div>
                                                 <!-- button akasi -->
-                                                <button type="button" class="btn btn-sm btn-primary text-white"
-                                                    data-bs-toggle="modal"
+                                                <button class="btn btn-info btn-sm text-white" data-bs-toggle="modal"
                                                     data-bs-target="#detailModal{{ $item->id }}">
-                                                    Detail
+                                                    <i class="bi bi-eye-fill"></i> Detail
                                                 </button>
-                                                <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
-                                                    data-bs-target="#editModal" onclick="editBuku({{ $item }})">
-                                                    Edit
+                                                <button class="btn btn-warning btn-sm text-white" data-bs-toggle="modal"
+                                                    data-bs-target="#editModal"
+                                                    onclick='editBuku(@json($item))'>
+                                                    <i class="bi bi-pencil-fill"></i> Edit
                                                 </button>
-                                                <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal"
                                                     data-bs-target="#deleteModal" data-id="{{ $item->id }}">
-                                                    Hapus
+                                                    <i class="bi bi-trash-fill"></i> Hapus
                                                 </button>
                                             </td>
                                         </tr>
@@ -125,8 +125,50 @@
                 </div>
             </div>
 
+            <!-- Modal Sukses -->
+            <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header bg-success text-white">
+                            <h5 class="modal-title" id="successModalLabel">Berhasil</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                        </div>
+                        <div class="modal-body">
+                            {{ session('success') }}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-success" data-bs-dismiss="modal">OK</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal Error -->
+            <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header bg-danger text-white">
+                            <h5 class="modal-title" id="errorModalLabel">Gagal Menambahkan Data</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Tutup"></button>
+                        </div>
+                        <div class="modal-body">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Tutup</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
             <!-- Modal delete -->
-            <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel"
+                aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header bg-primary text-white">
@@ -206,7 +248,9 @@
                                         <select class="form-select" id="kategori" name="kategori" required>
                                             <option selected disabled>Pilih kategori</option>
                                             @foreach ($kategori as $kat)
-                                                <option value="{{ $kat->kategori }}">{{ $kat->kategori }}</option>
+                                                <option value="{{ $kat->id }}">
+                                                    {{ $kat->kategori }} -- {{ $kat->jenis }}
+                                                </option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -276,7 +320,9 @@
                                     <select class="form-select" id="edit_kategori" name="kategori" required>
                                         <option selected disabled>Pilih kategori</option>
                                         @foreach ($kategori as $kat)
-                                            <option value="{{ $kat->kategori }}">{{ $kat->kategori }}</option>
+                                            <option value="{{ $kat->id }}">
+                                                {{ $kat->kategori }} -- {{ $kat->jenis }}
+                                            </option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -289,7 +335,7 @@
 
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary"
-                                        data-bs-dismiss="modal">Tutup</button>
+                                        data-bs-dismiss="modal">Batal</button>
                                     <button type="submit" class="btn btn-primary">Simpan</button>
                                 </div>
                             </form>
@@ -370,5 +416,17 @@
                     form.action = "{{ route('admin.management_buku.destroy', ':id') }}".replace(':id', id);
                 });
             }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            @if (session('success'))
+                var successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                successModal.show();
+            @endif
+
+            @if ($errors->any())
+                var errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+                errorModal.show();
+            @endif
         });
     </script>

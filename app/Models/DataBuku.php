@@ -23,4 +23,10 @@ class DataBuku extends Model
     {
         return $this->belongsTo(Kategori::class, 'kategori', 'kategori');
     }
+
+    // Relasi dengan model Harga (jika diperlukan)
+    public function harga()
+    {
+        return $this->hasOne(Harga::class, 'buku_id', 'id');
+    }
 }

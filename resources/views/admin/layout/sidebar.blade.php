@@ -21,13 +21,19 @@
         <li>
             <a href="{{ route('admin.management_kasir') }}"
                 class="nav-link text-dark {{ request()->routeIs('admin.management_kasir') ? 'active bg-primary text-white' : '' }}">
-                <i class="bi bi-person-badge"></i> Management Kasir
+                <i class="bi bi-person-badge"></i> Management User
             </a>
         </li>
         <li>
             <a href="{{ route('admin.management_kategori') }}"
                 class="nav-link text-dark {{ request()->routeIs('admin.management_kategori') ? 'active bg-primary text-white' : '' }}">
-                <i class="bi bi-tags"></i> Kategori
+                <i class="bi bi-tags"></i> Management Kategori
+            </a>
+        </li>
+        <li>
+            <a href="{{ route('admin.harga') }}"
+                class="nav-link text-dark {{ request()->routeIs('admin.harga') ? 'active bg-primary text-white' : '' }}">
+                <i class="bi bi-card-text"></i> Stok dan Harga
             </a>
         </li>
         <li>
@@ -36,6 +42,7 @@
                 <i class="bi bi-cart"></i> Riwayat Transaksi
             </a>
         </li>
+
         <hr>
         <li>
             <!-- Tombol untuk buka modal logout -->

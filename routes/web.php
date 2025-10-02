@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\HargaController;
 use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\KasirController;
 use App\Http\Controllers\ManagementbukuController;
@@ -41,9 +42,20 @@ Route::middleware(['auth', RoleMiddleware::class . ':admin'])->group(function ()
 
     //management kategori
     Route::get('/management-kategori', [Kategori::class, 'index'])->name('admin.management_kategori');
+    Route::post('/management-kategori', [Kategori::class, 'store'])->name('admin.tambah_kategori');
+    Route::delete('/management-kategori/{id}/delete', [Kategori::class, 'destroy'])->name('admin.hapus_kategori');
+    Route::get('/management-kategori/{id}/edit', [Kategori::class, 'edit'])->name('admin.edit_kategori');
+    Route::put('/management-kategori/{id}', [Kategori::class, 'update'])->name('admin.update_kategori');
 
     //riwayat transaksi
     Route::get('/riwayat', [TransaksiController::class, 'riwayat'])->name('admin.riwayat_transaksi');
+
+    //Harga
+    Route::get('/admin/harga', [HargaController::class, 'index'])->name('admin.harga');
+    Route::post('/admin/harga', [HargaController::class, 'store'])->name('admin.harga.store');
+    Route::put('/admin/harga/{id}', [HargaController::class, 'update'])->name('admin.update.harga');
+    Route::delete('/admin/harga/{id}/delete', [HargaController::class, 'destroy'])->name('admin.hapus.harga');
+    Route::get('/admin/harga/{id}/edit', [HargaController::class, 'edit'])->name('admin.edit.harga');
 });
 
 

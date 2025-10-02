@@ -11,10 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('kategori', function (Blueprint $table) {
+        Schema::create('harga', function (Blueprint $table) {
             $table->id();
-            $table->string('kategori')->nullable();
-            $table->string('jenis')->nullable();
+            $table->foreignId('buku_id')
+                ->constrained('databuku')
+                ->onDelete('cascade');
+            $table->integer('stok')->default(0);
+            $table->decimal('harga', 15, 2); // format harga, maksimal 15 digit, 2 desimal
             $table->timestamps();
         });
     }
